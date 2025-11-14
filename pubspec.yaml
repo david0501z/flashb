@@ -36,7 +36,7 @@ dependencies:
   ffi: ^2.0.1
   webdav_client: ^1.2.2
   dio: ^5.8.0+1
-  win32: ^5.5.1
+  win32: any
   re_editor:
     git:
       url: https://github.com/chen08209/re-editor.git
