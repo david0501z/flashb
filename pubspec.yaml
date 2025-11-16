@@ -53,6 +53,8 @@ dependencies:
   flutter_riverpod: ^2.4.9
   riverpod_annotation: ^2.3.3
   riverpod: ^2.4.9
+    # WebView支持
+  flutter_inappwebview: ^6.0.0
   material_color_utilities: ^0.11.1
   flutter_js:
     git:
