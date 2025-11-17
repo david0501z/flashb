@@ -1,3 +1,4 @@
+// @dart=3.0
 import 'package:collection/collection.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';

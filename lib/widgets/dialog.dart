@@ -25,6 +25,12 @@ class CommonDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, ref) {
     final size = ref.watch(viewSizeProvider);
+    
+    // 如果viewSize还是初始的Size.zero，则使用当前context的MediaQuery
+    final effectiveSize = size == Size.zero 
+        ? MediaQuery.of(context).size 
+        : size;
+        
     return AlertDialog(
       title: Text(title),
       actions: actions,
@@ -33,12 +39,12 @@ class CommonDialog extends ConsumerWidget {
       content: Container(
         constraints: BoxConstraints(
           maxHeight: min(
-            size.height - 40,
+            max(effectiveSize.height - 40, 0),
             500,
           ),
           maxWidth: 300,
         ),
-        width: size.width - 40,
+        width: max(effectiveSize.width - 40, 0),
         child: !overrideScroll
             ? SingleChildScrollView(
                 child: child,
@@ -60,10 +66,16 @@ class CommonModal extends ConsumerWidget {
   @override
   Widget build(BuildContext context, ref) {
     final size = ref.watch(viewSizeProvider);
+    
+    // 如果viewSize还是初始的Size.zero，则使用当前context的MediaQuery
+    final effectiveSize = size == Size.zero 
+        ? MediaQuery.of(context).size 
+        : size;
+        
     return Center(
       child: Container(
-        width: size.width * 0.85,
-        height: size.height * 0.85,
+        width: effectiveSize.width * 0.85,
+        height: effectiveSize.height * 0.85,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
         ),

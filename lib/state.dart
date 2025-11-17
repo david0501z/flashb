@@ -1,3 +1,4 @@
+// @dart=3.0
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi' show Pointer;
@@ -6,7 +7,7 @@ import 'dart:isolate';
 
 import 'package:animations/animations.dart';
 import 'package:dio/dio.dart';
-import 'package:dynamic_color/dynamic_color.dart';
+// import 'package:dynamic_color/dynamic_color.dart'; // Temporarily disabled
 import 'package:fl_clash/common/theme.dart';
 import 'package:fl_clash/core/core.dart';
 import 'package:fl_clash/enum/enum.dart';
@@ -41,7 +42,7 @@ class GlobalState {
   late Measure measure;
   late CommonTheme theme;
   late Color accentColor;
-  CorePalette? corePalette;
+  // CorePalette? corePalette; // Temporarily disabled due to dynamic_color removal
   DateTime? startTime;
   UpdateTasks tasks = [];
   final navigatorKey = GlobalKey<NavigatorState>();
@@ -118,10 +119,11 @@ class GlobalState {
 
   Future<void> _initDynamicColor() async {
     try {
-      corePalette = await DynamicColorPlugin.getCorePalette();
-      accentColor =
-          await DynamicColorPlugin.getAccentColor() ??
-          Color(defaultPrimaryColor);
+      // corePalette = await DynamicColorPlugin.getCorePalette(); // Temporarily disabled
+      // accentColor =
+      //     await DynamicColorPlugin.getAccentColor() ??
+      //     Color(defaultPrimaryColor);
+      accentColor = Color(defaultPrimaryColor); // Fallback color
     } catch (_) {}
   }
 

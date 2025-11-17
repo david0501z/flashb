@@ -270,7 +270,6 @@ class LogDetailDialog extends StatelessWidget {
       ],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 6,
         children: [
           SelectableText(
             log.payload,

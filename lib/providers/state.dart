@@ -1,4 +1,5 @@
-import 'package:dynamic_color/dynamic_color.dart';
+// @dart=3.0
+// import 'package:dynamic_color/dynamic_color.dart'; // Temporarily disabled
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
@@ -556,11 +557,7 @@ ColorScheme genColorScheme(
     //   return globalState.corePalette!.toColorScheme(brightness: brightness);
     // }
     return ColorScheme.fromSeed(
-      seedColor:
-          globalState.corePalette
-              ?.toColorScheme(brightness: brightness)
-              .primary ??
-          globalState.accentColor,
+      seedColor: globalState.accentColor,
       brightness: brightness,
       dynamicSchemeVariant: vm2.b,
     );

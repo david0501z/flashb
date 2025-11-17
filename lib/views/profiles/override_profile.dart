@@ -153,8 +153,8 @@ class _OverrideProfileViewState extends ConsumerState<OverrideProfileView> {
                         vertical: 0,
                       ),
                       title: Row(
-                        spacing: 8,
                         children: [
+                          const SizedBox(width: 8),
                           Icon(Icons.info),
                           Text(appLocalizations.overrideInvalidTip),
                         ],

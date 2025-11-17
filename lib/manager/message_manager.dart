@@ -101,7 +101,7 @@ class MessageManagerState extends State<MessageManager> {
                               _cancelMessage(messages.last.id);
                             },
                             child: Card(
-                              shape: const RoundedSuperellipseBorder(
+                              shape: const RoundedRectangleBorder(
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(14),
                                 ),

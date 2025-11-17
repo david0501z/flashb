@@ -470,7 +470,6 @@ class _TextScaleFactorItem extends ConsumerWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             mainAxisSize: MainAxisSize.max,
-            spacing: 32,
             children: [
               Expanded(
                 child: DisabledMask(
@@ -480,7 +479,6 @@ class _TextScaleFactorItem extends ConsumerWidget {
                     child: SliderTheme(
                       data: _SliderDefaultsM3(context),
                       child: Slider(
-                        padding: EdgeInsets.zero,
                         min: minTextScale,
                         max: maxTextScale,
                         value: textScale.scale,
@@ -532,7 +530,7 @@ class _PaletteDialogState extends State<_PaletteDialog> {
         ),
         TextButton(
           onPressed: () {
-            Navigator.of(context).pop(_controller.value.toARGB32());
+            Navigator.of(context).pop(_controller.value.value);
           },
           child: Text(appLocalizations.confirm),
         ),
@@ -634,13 +632,13 @@ class _SliderDefaultsM3 extends SliderThemeData {
 
   @override
   SliderComponentShape? get valueIndicatorShape =>
-      const RoundedRectSliderValueIndicatorShape();
+      const PaddleSliderValueIndicatorShape();
 
   @override
-  SliderComponentShape? get thumbShape => const HandleThumbShape();
+  SliderComponentShape? get thumbShape => const RoundSliderThumbShape();
 
   @override
-  SliderTrackShape? get trackShape => const GappedSliderTrackShape();
+  SliderTrackShape? get trackShape => const RectangularSliderTrackShape();
 
   @override
   SliderComponentShape? get overlayShape => const RoundSliderOverlayShape();

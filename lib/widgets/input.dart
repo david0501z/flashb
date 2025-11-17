@@ -30,34 +30,31 @@ class OptionsDialog<T> extends StatelessWidget {
     return CommonDialog(
       title: title,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-      child: RadioGroup(
-        onChanged: (value) {
-          Navigator.of(context).pop(value);
-        },
-        groupValue: value,
-        child: Wrap(
-          children: [
-            for (final option in options)
-              Builder(
-                builder: (context) {
-                  if (value == option) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      Scrollable.ensureVisible(context);
-                    });
-                  }
-                  return ListItem.radio(
-                    delegate: RadioDelegate(
+      child: Wrap(
+        children: [
+          for (final option in options)
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: InkWell(
+                onTap: () {
+                  Navigator.of(context).pop(option);
+                },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Radio<T>(
                       value: option,
-                      onTab: () {
+                      groupValue: value,
+                      onChanged: (_) {
                         Navigator.of(context).pop(option);
                       },
                     ),
-                    title: Text(textBuilder(option)),
-                  );
-                },
+                    Text(textBuilder(option)),
+                  ],
+                ),
               ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }

@@ -3,11 +3,10 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  dynamic_color
   file_selector_linux
   gtk
   hotkey_manager_linux
-  screen_retriever_linux
+  screen_retriever
   tray_manager
   url_launcher_linux
   window_manager

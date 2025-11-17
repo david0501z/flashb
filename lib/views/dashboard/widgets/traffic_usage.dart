@@ -130,7 +130,7 @@ class TrafficUsage extends StatelessWidget {
                                           height: 8,
                                           decoration: ShapeDecoration(
                                             color: primaryColor,
-                                            shape: RoundedSuperellipseBorder(
+                                            shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(3),
                                             ),
@@ -154,7 +154,7 @@ class TrafficUsage extends StatelessWidget {
                                           height: 8,
                                           decoration: ShapeDecoration(
                                             color: secondaryColor,
-                                            shape: RoundedSuperellipseBorder(
+                                            shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(3),
                                             ),

@@ -62,7 +62,6 @@ class TrackerInfoItem extends ConsumerWidget {
         Row(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          spacing: 8,
           children: [
             Flexible(
               child: Text(
@@ -94,7 +93,6 @@ class TrackerInfoItem extends ConsumerWidget {
     final subTitle = SizedBox(
       height: subTitleHeight,
       child: Row(
-        spacing: 8,
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -174,9 +172,11 @@ class TrackerInfoItem extends ConsumerWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
-            spacing: 12,
             children: [
-              if (icon != null) icon,
+              if (icon != null) ...[
+                icon,
+                const SizedBox(width: 12),
+              ],
               Flexible(child: title),
             ],
           ),
@@ -249,9 +249,9 @@ class TrackerInfoDetailView extends StatelessWidget {
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 20,
         children: [
           Text(appLocalizations.proxyChains),
+          const SizedBox(width: 20),
           Flexible(child: chains),
         ],
       ),
@@ -265,15 +265,15 @@ class TrackerInfoDetailView extends StatelessWidget {
   }) {
     return ListItem(
       title: Row(
-        spacing: 16,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            spacing: 4,
             children: [
               Text(title),
-              if (quickCopy)
+              if (quickCopy) ...[
+                const SizedBox(width: 4),
+
                 Padding(
                   padding: EdgeInsets.only(top: 4),
                   child: IconButton(
@@ -283,6 +283,7 @@ class TrackerInfoDetailView extends StatelessWidget {
                     onPressed: () {},
                   ),
                 ),
+              ],
             ],
           ),
           Flexible(child: Text(desc, textAlign: TextAlign.end)),

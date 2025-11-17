@@ -273,7 +273,7 @@ class AppIcon extends StatelessWidget {
     return Container(
       decoration: ShapeDecoration(
         color: context.colorScheme.surfaceContainerHighest,
-        shape: RoundedSuperellipseBorder(
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
         ),
       ),

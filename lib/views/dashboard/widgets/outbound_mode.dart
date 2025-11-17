@@ -36,42 +36,45 @@ class OutboundMode extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.only(top: 12, bottom: 16),
-                child: RadioGroup<Mode>(
-                  groupValue: mode,
-                  onChanged: (value) {
-                    if (value == null) {
-                      return;
-                    }
-                    globalState.appController.changeMode(value);
-                  },
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      for (final item in Mode.values)
-                        Flexible(
-                          fit: FlexFit.tight,
-                          child: ListItem.radio(
-                            dense: true,
-                            horizontalTitleGap: 4,
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    for (final item in Mode.values)
+                      Flexible(
+                        fit: FlexFit.tight,
+                        child: InkWell(
+                          onTap: () {
+                            globalState.appController.changeMode(item);
+                          },
+                          child: Padding(
                             padding: EdgeInsets.only(left: 12.ap, right: 16.ap),
-                            delegate: RadioDelegate(
-                              onTab: () {
-                                globalState.appController.changeMode(item);
-                              },
-                              value: item,
-                            ),
-                            title: Text(
-                              Intl.message(item.name),
-                              style: Theme.of(
-                                context,
-                              ).textTheme.bodyMedium?.toSoftBold,
+                            child: Row(
+                              children: [
+                                Radio<Mode>(
+                                  value: item,
+                                  groupValue: mode,
+                                  onChanged: (value) {
+                                    if (value != null) {
+                                      globalState.appController.changeMode(value);
+                                    }
+                                  },
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    Intl.message(item.name),
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodyMedium?.toSoftBold,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                    ],
-                  ),
+                      ),
+                  ],
                 ),
               ),
             ),

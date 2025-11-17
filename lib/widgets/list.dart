@@ -16,9 +16,16 @@ class Delegate {
 
 class RadioDelegate<T> extends Delegate {
   final T value;
+  final T? groupValue;
+  final void Function(T?)? onChanged;
   final void Function()? onTab;
 
-  const RadioDelegate({required this.value, this.onTab});
+  const RadioDelegate({
+    required this.value, 
+    this.groupValue, 
+    this.onChanged, 
+    this.onTab
+  });
 }
 
 class SwitchDelegate<T> extends Delegate {
@@ -414,6 +421,8 @@ class ListItem<T> extends StatelessWidget {
         leading: Radio<T>(
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
           value: radioDelegate.value,
+          groupValue: radioDelegate.groupValue,
+          onChanged: radioDelegate.onChanged,
           toggleable: true,
         ),
         trailing: trailing,
@@ -509,7 +518,7 @@ Widget generateSectionV2({
 }) {
   final genItems = items
       .map<Widget>((item) {
-        return ClipRSuperellipse(
+        return ClipRRect(
           borderRadius: BorderRadius.circular(4),
           child: CommonCard(
             type: CommonCardType.filled,
@@ -523,7 +532,7 @@ Widget generateSectionV2({
     children: [
       if (items.isNotEmpty && title != null)
         ListHeader(title: title, actions: actions),
-      ClipRSuperellipse(
+      ClipRRect(
         borderRadius: BorderRadius.circular(14),
         child: Column(children: [...genItems]),
       ),

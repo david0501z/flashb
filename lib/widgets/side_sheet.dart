@@ -84,7 +84,7 @@ class _SideSheetState extends State<SideSheet> {
     final double elevation = widget.elevation ?? 0;
     final ShapeBorder shape =
         widget.shape ??
-        RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(0));
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(0));
 
     final BoxConstraints constraints =
         widget.constraints ??
@@ -542,7 +542,7 @@ class ModalSideSheetRoute<T> extends PopupRoute<T> {
 
   @override
   Widget buildModalBarrier() {
-    if (barrierColor.a != 0 && !offstage) {
+    if (barrierColor.opacity != 0 && !offstage) {
       assert(barrierColor != barrierColor.opacity0);
       final Animation<Color?> color = animation!.drive(
         ColorTween(

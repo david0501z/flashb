@@ -169,8 +169,8 @@ class ScannerOverlay extends CustomPainter {
     final backgroundPath = Path()..addRect(Rect.largest);
 
     final cutoutPath = Path()
-      ..addRSuperellipse(
-        RSuperellipse.fromRectAndCorners(
+      ..addRRect(
+        RRect.fromRectAndCorners(
           scanWindow,
           topLeft: Radius.circular(borderRadius),
           topRight: Radius.circular(borderRadius),
@@ -195,7 +195,7 @@ class ScannerOverlay extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 4.0;
 
-    final border = RSuperellipse.fromRectAndCorners(
+    final border = RRect.fromRectAndCorners(
       scanWindow,
       topLeft: Radius.circular(borderRadius),
       topRight: Radius.circular(borderRadius),
@@ -204,7 +204,7 @@ class ScannerOverlay extends CustomPainter {
     );
 
     canvas.drawPath(backgroundWithCutout, backgroundPaint);
-    canvas.drawRSuperellipse(border, borderPaint);
+    canvas.drawRRect(border, borderPaint);
   }
 
   @override

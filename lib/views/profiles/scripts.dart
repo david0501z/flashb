@@ -48,67 +48,72 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
             label: appLocalizations.nullTip(appLocalizations.script),
           );
         }
-        return RadioGroup(
-          onChanged: (value) {
-            if (value == null) {
-              return;
-            }
-            ref.read(scriptStateProvider.notifier).setId(value);
-          },
-          groupValue: currentId,
-          child: ListView.builder(
-            padding: kMaterialListPadding.copyWith(bottom: 16 + 64),
-            itemCount: scripts.length,
-            itemBuilder: (context, index) {
-              final script = scripts[index];
-              return Container(
-                padding: kTabLabelPadding,
-                margin: EdgeInsets.symmetric(vertical: 6),
-                child: CommonCard(
-                  type: CommonCardType.filled,
-                  radius: 16,
-                  child: ListItem.radio(
+        return ListView.builder(
+          padding: kMaterialListPadding.copyWith(bottom: 16 + 64),
+          itemCount: scripts.length,
+          itemBuilder: (context, index) {
+            final script = scripts[index];
+            return Container(
+              padding: kTabLabelPadding,
+              margin: EdgeInsets.symmetric(vertical: 6),
+              child: CommonCard(
+                type: CommonCardType.filled,
+                radius: 16,
+                child: InkWell(
+                  onTap: () {
+                    ref.read(scriptStateProvider.notifier).setId(script.id);
+                  },
+                  child: Padding(
                     padding: const EdgeInsets.only(left: 12, right: 12),
-                    title: Text(script.label),
-                    delegate: RadioDelegate(
-                      value: script.id,
-                      onTab: () {
-                        ref.read(scriptStateProvider.notifier).setId(script.id);
-                      },
-                    ),
-                    trailing: CommonPopupBox(
-                      targetBuilder: (open) {
-                        return IconButton(
-                          onPressed: () {
-                            open();
+                    child: Row(
+                      children: [
+                        Radio<String>(
+                          value: script.id,
+                          groupValue: currentId,
+                          onChanged: (value) {
+                            if (value != null) {
+                              ref.read(scriptStateProvider.notifier).setId(value);
+                            }
                           },
-                          icon: Icon(Icons.more_vert),
-                        );
-                      },
-                      popup: CommonPopupMenu(
-                        items: [
-                          PopupMenuItemData(
-                            icon: Icons.edit,
-                            label: appLocalizations.edit,
-                            onPressed: () {
-                              _handleToEditor(script: script);
-                            },
+                        ),
+                        Expanded(
+                          child: Text(script.label),
+                        ),
+                        CommonPopupBox(
+                          targetBuilder: (open) {
+                            return IconButton(
+                              onPressed: () {
+                                open();
+                              },
+                              icon: Icon(Icons.more_vert),
+                            );
+                          },
+                          popup: CommonPopupMenu(
+                            items: [
+                              PopupMenuItemData(
+                                icon: Icons.edit,
+                                label: appLocalizations.edit,
+                                onPressed: () {
+                                  _handleToEditor(script: script);
+                                },
+                              ),
+                              PopupMenuItemData(
+                                icon: Icons.delete,
+                                label: appLocalizations.delete,
+                                onPressed: () {
+                                  _handleDelScript(script.label);
+                                },
+                              ),
+                            ],
                           ),
-                          PopupMenuItemData(
-                            icon: Icons.delete,
-                            label: appLocalizations.delete,
-                            onPressed: () {
-                              _handleDelScript(script.label);
-                            },
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         );
       },
     );

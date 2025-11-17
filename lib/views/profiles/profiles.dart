@@ -1,3 +1,4 @@
+// @dart=3.0
 import 'dart:ui';
 
 import 'package:fl_clash/common/common.dart';

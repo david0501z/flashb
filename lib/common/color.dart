@@ -44,10 +44,7 @@ extension ColorExtension on Color {
   }
 
   int get value32bit {
-    return _floatToInt8(a) << 24 |
-        _floatToInt8(r) << 16 |
-        _floatToInt8(g) << 8 |
-        _floatToInt8(b) << 0;
+    return value;
   }
 
   int get alpha8bit => (0xff000000 & value32bit) >> 24;
@@ -74,7 +71,7 @@ extension ColorExtension on Color {
   }
 
   String get hex {
-    final value = toARGB32();
+    final value = value32bit;
     final red = (value >> 16) & 0xFF;
     final green = (value >> 8) & 0xFF;
     final blue = value & 0xFF;

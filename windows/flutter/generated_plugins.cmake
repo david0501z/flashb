@@ -5,12 +5,11 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   app_links
   connectivity_plus
-  dynamic_color
   file_selector_windows
   flutter_inappwebview_windows
   hotkey_manager_windows
   proxy
-  screen_retriever_windows
+  screen_retriever
   tray_manager
   url_launcher_windows
   window_ext

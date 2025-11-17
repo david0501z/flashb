@@ -207,7 +207,6 @@ class AppSidebarContainer extends ConsumerWidget {
                           children: [
                             Expanded(
                               child: NavigationRail(
-                                scrollable: true,
                                 minExtendedWidth: 200,
                                 backgroundColor: Colors.transparent,
                                 selectedLabelTextStyle: context

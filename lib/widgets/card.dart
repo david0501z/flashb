@@ -1,3 +1,4 @@
+// @dart=3.0
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/widgets/fade_box.dart';
@@ -177,7 +178,7 @@ class CommonCard extends StatelessWidget {
       style: ButtonStyle(
         padding: const WidgetStatePropertyAll(EdgeInsets.zero),
         shape: WidgetStatePropertyAll(
-          RoundedSuperellipseBorder(
+          RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(radius),
           ),
         ),

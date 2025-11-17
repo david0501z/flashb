@@ -1,3 +1,4 @@
+// @dart=3.0
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
@@ -137,7 +138,7 @@ class _AdaptiveSheetScaffoldState extends State<AdaptiveSheetScaffold> {
         clipBehavior: Clip.hardEdge,
         decoration: ShapeDecoration(
           color: backgroundColor,
-          shape: RoundedSuperellipseBorder(
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(top: Radius.circular(28.0)),
           ),
         ),
@@ -152,7 +153,7 @@ class _AdaptiveSheetScaffoldState extends State<AdaptiveSheetScaffold> {
                 width: handleSize.width,
                 decoration: ShapeDecoration(
                   color: context.colorScheme.onSurfaceVariant,
-                  shape: RoundedSuperellipseBorder(
+                  shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(handleSize.height / 2),
                   ),
                 ),

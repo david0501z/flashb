@@ -378,7 +378,7 @@ class _CommonTabBarState<T extends Object> extends State<CommonTabBar<T>>
         clipBehavior: Clip.antiAlias,
         padding: widget.padding.resolve(Directionality.of(context)),
         decoration: ShapeDecoration(
-          shape: RoundedSuperellipseBorder(
+          shape: RoundedRectangleBorder(
             borderRadius: const BorderRadius.all(_kCornerRadius),
           ),
           color: widget.backgroundColor,
@@ -1089,18 +1089,18 @@ class _RenderSegmentedControl<T extends Object> extends RenderBox
   }
 
   void _paintThumb(PaintingContext context, Offset offset, Rect thumbRect) {
-    final RSuperellipse thumbRSuperellipse = RSuperellipse.fromRectAndRadius(
+    final RRect thumbRRect = RRect.fromRectAndRadius(
       thumbRect.shift(offset),
       _kThumbRadius,
     );
 
-    context.canvas.drawRSuperellipse(
-      thumbRSuperellipse.inflate(0.5),
+    context.canvas.drawRRect(
+      thumbRRect.inflate(0.5),
       Paint()..color = const Color(0x0A000000),
     );
 
-    context.canvas.drawRSuperellipse(
-      thumbRSuperellipse,
+    context.canvas.drawRRect(
+      thumbRRect,
       Paint()..color = thumbColor,
     );
   }

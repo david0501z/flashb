@@ -1,3 +1,4 @@
+// @dart=3.0
 import 'dart:async';
 
 import 'package:fl_clash/enum/enum.dart';

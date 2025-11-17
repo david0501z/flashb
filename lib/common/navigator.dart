@@ -1,3 +1,4 @@
+// @dart=3.0
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
@@ -228,7 +229,7 @@ class _CommonPageTransitionState extends State<CommonPageTransition> {
           DecorationTween(
             begin: const _CommonEdgeShadowDecoration(),
             end: _CommonEdgeShadowDecoration(<Color>[
-              widget.context.colorScheme.inverseSurface.withValues(alpha: 0.02),
+              widget.context.colorScheme.inverseSurface.withOpacity(0.02),
               Colors.transparent,
             ]),
           ),
@@ -268,7 +269,7 @@ class _CommonEdgeShadowDecoration extends Decoration {
 
 class _CommonEdgeShadowPainter extends BoxPainter {
   _CommonEdgeShadowPainter(this._decoration, super.onChanged)
-    : assert(_decoration._colors == null || _decoration._colors.length > 1);
+    : assert(_decoration._colors == null || _decoration._colors!.length > 1);
 
   final _CommonEdgeShadowDecoration _decoration;
 

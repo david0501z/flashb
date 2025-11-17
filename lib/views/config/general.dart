@@ -589,8 +589,8 @@ class _PortDialogState extends ConsumerState<_PortDialog> {
             curve: Curves.easeOutQuad,
             alignment: Alignment.topCenter,
             child: Column(
-              spacing: 24,
               children: [
+                const SizedBox(height: 24),
                 TextFormField(
                   keyboardType: TextInputType.url,
                   maxLines: 1,

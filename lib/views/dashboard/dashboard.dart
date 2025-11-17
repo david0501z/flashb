@@ -73,9 +73,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                         padding: EdgeInsets.zero,
                         style: IconButton.styleFrom(
                           backgroundColor: Colors.greenAccent,
-                          foregroundColor: switch (Theme.brightnessOf(
-                            context,
-                          )) {
+                          foregroundColor: switch (Theme.of(context).brightness) {
                             Brightness.light =>
                               context.colorScheme.onSurfaceVariant,
                             Brightness.dark =>
@@ -83,7 +81,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                           },
                         ),
                         onPressed: _handleConnection,
-                        icon: Icon(Icons.check, fontWeight: FontWeight.w900),
+                        icon: Icon(Icons.check),
                       )
                     : FilledButton.icon(
                         key: ValueKey(coreStatus),
@@ -99,9 +97,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                           },
                           foregroundColor: switch (coreStatus) {
                             CoreStatus.connecting => null,
-                            CoreStatus.connected => switch (Theme.brightnessOf(
-                              context,
-                            )) {
+                            CoreStatus.connected => switch (Theme.of(context).brightness) {
                               Brightness.light =>
                                 context.colorScheme.onSurfaceVariant,
                               Brightness.dark => null,
@@ -124,11 +120,9 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                             ),
                             CoreStatus.connected => Icon(
                               Icons.check_sharp,
-                              fontWeight: FontWeight.w900,
                             ),
                             CoreStatus.disconnected => Icon(
                               Icons.restart_alt_sharp,
-                              fontWeight: FontWeight.w900,
                             ),
                           },
                         ),
