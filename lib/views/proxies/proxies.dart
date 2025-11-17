@@ -152,6 +152,7 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
       body: switch (proxiesType) {
         ProxiesType.tab => ProxiesTabView(key: _proxiesTabKey),
         ProxiesType.list => const ProxiesListView(),
+        _ => const ProxiesListView(),
       },
     );
   }

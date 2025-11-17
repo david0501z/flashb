@@ -93,6 +93,7 @@ class OutboundModeV2 extends StatelessWidget {
       Mode.rule => context.colorScheme.onSecondaryContainer,
       Mode.global => context.colorScheme.onPrimaryContainer,
       Mode.direct => context.colorScheme.onTertiaryContainer,
+      _ => context.colorScheme.onSurface,
     };
   }
 
@@ -112,6 +113,7 @@ class OutboundModeV2 extends StatelessWidget {
               Mode.rule => context.colorScheme.secondaryContainer,
               Mode.global => globalState.theme.darken3PrimaryContainer,
               Mode.direct => context.colorScheme.tertiaryContainer,
+              _ => context.colorScheme.surface,
             };
             return LayoutBuilder(
               builder: (_, constraints) {

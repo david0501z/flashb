@@ -43,7 +43,7 @@ class HotKeyView extends StatelessWidget {
         final hotAction = HotAction.values[index];
         return Consumer(
           builder: (context, ref, child) {
-            final hotKeyAction = ref.watch(getHotKeyActionProvider(hotAction));
+            final hotKeyAction = ref.watch(getHotKeyActionProvider.call(hotAction));
             return ListItem(
               title: Text(IntlExt.actionMessage(hotAction.name)),
               subtitle: Text(

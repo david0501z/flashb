@@ -36,7 +36,7 @@ class _StartButtonState extends ConsumerState<StartButton>
       next,
     ) {
       if (next != isStart) {
-        isStart = next;
+        isStart = next as bool;
         updateController();
       }
     }, fireImmediately: true);
