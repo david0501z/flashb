@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'generated/app.g.dart';
+part 'app.g.dart';
 
 @riverpod
 class RealTunEnable extends _$RealTunEnable {
@@ -194,22 +194,22 @@ class SideWidth extends _$SideWidth {
 }
 
 @riverpod
-double viewWidth(ViewWidthRef ref) {
+double viewWidth(Ref ref) {
   return ref.watch(viewSizeProvider).width;
 }
 
 @riverpod
-ViewMode viewMode(ViewModeRef ref) {
+ViewMode viewMode(Ref ref) {
   return utils.getViewMode(ref.watch(viewWidthProvider));
 }
 
 @riverpod
-bool isMobileView(IsMobileViewRef ref) {
+bool isMobileView(Ref ref) {
   return ref.watch(viewModeProvider) == ViewMode.mobile;
 }
 
 @riverpod
-double viewHeight(ViewHeightRef ref) {
+double viewHeight(Ref ref) {
   return ref.watch(viewSizeProvider).height;
 }
 
