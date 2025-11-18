@@ -101,11 +101,11 @@ class Protocol {
         final urlProtocolValue = path.getValue('URL Protocol');
         path.close();
         return urlProtocolValue != null;
-      } on WindowsException catch (e) {
+      } catch (e) {
         // 如果键不存在，WindowsException 会被抛出
-        if (e.errorCode == 2) { // ERROR_FILE_NOT_FOUND
+        //if (e.errorCode == 2) { // ERROR_FILE_NOT_FOUND
           return false;
-        }
+        
         rethrow;
       }
     } catch (e) {
