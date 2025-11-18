@@ -15,21 +15,30 @@ class Protocol {
     String protocolRegKey = 'Software\\Classes\\$scheme';
     String protocolCmdRegKey = '$protocolRegKey\\shell\\open\\command';
     
-    // 创建主协议键并设置值
+    // 创建主协议键
     final protocolKey = Registry.currentUser.createKey(protocolRegKey);
-    protocolKey.createValue(RegistryStringValue(
-      protocolKey.path,
-      'URL Protocol',
-      '',
-    ));
     
-    // 创建命令键并设置值
-    final commandKey = Registry.currentUser.createKey(protocolCmdRegKey);
-    commandKey.createValue(RegistryStringValue(
-      commandKey.path,
+    // 设置 URL Protocol 值 - 使用 setValue 方法
+    protocolKey.setValue(
+      'URL Protocol',
+      RegistryValueType.string,
+      '',
+    );
+    
+    // 可选：设置默认值（协议描述）
+    protocolKey.setValue(
       '',  // 默认值名称
+      RegistryValueType.string,
+      'URL:$scheme Protocol',  // 协议描述
+    );
+    
+    // 创建命令键并设置命令值
+    final commandKey = Registry.currentUser.createKey(protocolCmdRegKey);
+    commandKey.setValue(
+      '',  // 默认值名称
+      RegistryValueType.string,
       '"${Platform.resolvedExecutable}" "%1"',
-    ));
+    );
   }
 }
 
