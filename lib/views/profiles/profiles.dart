@@ -163,7 +163,7 @@ class _ProfilesViewState extends State<ProfilesView> {
                         profile: profilesSelectorState.profiles[i],
                         groupValue: profilesSelectorState.currentProfileId,
                         onChanged: (profileId) {
-                          ref.read(currentProfileIdProvider.notifier).value =
+                          ref.read(currentProfileIdProvider.notifier).state =
                               profileId;
                         },
                       ),

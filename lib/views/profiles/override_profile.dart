@@ -64,7 +64,7 @@ class _OverrideProfileViewState extends ConsumerState<OverrideProfileView> {
         final overrideData = ref.read(
           getProfileOverrideDataProvider(widget.profileId),
         );
-        ref.read(profileOverrideStateProvider.notifier).value =
+        ref.read(profileOverrideStateProvider.notifier).state =
             ProfileOverrideModel(snippet: snippet, overrideData: overrideData);
       });
     });
