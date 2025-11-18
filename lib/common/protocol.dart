@@ -60,20 +60,27 @@ class Protocol {
     try {
       String protocolRegKey = 'Software\\Classes\\$scheme';
       
-      // 使用 try-catch 来检查键是否存在，因为新版本中 openKey 可能已改变
+      // 使用新的 API 检查键是否存在
       try {
-        final key = Registry.currentUser.openKey(protocolRegKey);
-        if (key != null) {
-          Registry.currentUser.deleteKey(protocolRegKey, recursive: true);
-          print('✅ Protocol $scheme unregistered successfully');
+        // 尝试打开路径来检查键是否存在
+        final path = Registry.openPath(
+          RegistryHive.currentUser, 
+          path: protocolRegKey,
+        );
+        
+        // 如果成功打开，说明键存在，需要删除
+        path.close();
+        Registry.currentUser.deleteKey(protocolRegKey, recursive: true);
+        print('✅ Protocol $scheme unregistered successfully');
+        return true;
+      } on WindowsException catch (e) {
+        // 如果键不存在，WindowsException 会被抛出
+        if (e.errorCode == 2) { // ERROR_FILE_NOT_FOUND
+          print('ℹ️ Protocol $scheme was not registered');
           return true;
         }
-      } catch (e) {
-        // 如果打开键失败，可能键不存在
+        rethrow;
       }
-      
-      print('ℹ️ Protocol $scheme was not registered');
-      return true;
     } catch (e) {
       print('❌ Error unregistering protocol $scheme: $e');
       return false;
@@ -83,12 +90,25 @@ class Protocol {
   bool isRegistered(String scheme) {
     try {
       String protocolRegKey = 'Software\\Classes\\$scheme';
-      final key = Registry.currentUser.openKey(protocolRegKey);
-      if (key == null) return false;
       
-      // 检查必要的值是否存在
-      final urlProtocolValue = key.getValue('URL Protocol');
-      return urlProtocolValue != null;
+      // 使用新的 API 检查键是否存在
+      try {
+        final path = Registry.openPath(
+          RegistryHive.currentUser, 
+          path: protocolRegKey,
+        );
+        
+        // 检查必要的值是否存在
+        final urlProtocolValue = path.getValue('URL Protocol');
+        path.close();
+        return urlProtocolValue != null;
+      } on WindowsException catch (e) {
+        // 如果键不存在，WindowsException 会被抛出
+        if (e.errorCode == 2) { // ERROR_FILE_NOT_FOUND
+          return false;
+        }
+        rethrow;
+      }
     } catch (e) {
       return false;
     }
