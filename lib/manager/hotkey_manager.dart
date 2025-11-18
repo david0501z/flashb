@@ -24,10 +24,10 @@ class _HotKeyManagerState extends ConsumerState<HotKeyManager> {
   @override
   void initState() {
     super.initState();
-    ref.listenManual(
+    ref.listenManual<List<HotKeyAction>>(
       hotKeyActionsProvider,
-      (prev, next) {
-        if (!hotKeyActionListEquality.equals(prev, next)) {
+      (List<HotKeyAction>? prev, List<HotKeyAction>? next) {
+        if (prev != null && next != null && !hotKeyActionListEquality.equals(prev, next)) {
           _updateHotKeys(hotKeyActions: next);
         }
       },
