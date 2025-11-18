@@ -88,11 +88,11 @@ jobs:
           dart run build_runner build --delete-conflicting-outputs
 
       - name: Setup
-        if: true
+        if: false
         run: dart setup.dart ${{ matrix.platform }} ${{ matrix.arch && format('--arch {0}', matrix.arch) }} ${{ env.IS_STABLE == 'true' && '--env stable' || '' }}
 
       - name: build
-        if: false
+        if: true
         run: |
           flutter build apk --debug --verbose
           #cd android
@@ -103,7 +103,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: artifact-${{ matrix.platform }}${{ matrix.arch && format('-{0}', matrix.arch) }}
-          path: ./dist
+          path: ./build/app/outputs/flutter-apk/app-debug.apk
           overwrite: true
 
   changelog:
