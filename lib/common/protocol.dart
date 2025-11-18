@@ -15,15 +15,15 @@ class Protocol {
   void register(String scheme) {
     String protocolRegKey = 'Software\\Classes\\$scheme';
     RegistryValue protocolRegValue = RegistryValue(
-      'URL Protocol',
-      RegistryValueType.string,
-      '',
+      name: 'URL Protocol',
+      type: RegistryValueType.string,
+      data: '',
     );
     String protocolCmdRegKey = 'shell\\open\\command';
     RegistryValue protocolCmdRegValue = RegistryValue(
-      '',
-      RegistryValueType.string,
-      '"${Platform.resolvedExecutable}" "%1"',
+      name: '',
+      type: RegistryValueType.string,
+      data: '"${Platform.resolvedExecutable}" "%1"',
     );
     final regKey = Registry.currentUser.createKey(protocolRegKey);
     regKey.createValue(protocolRegValue);
