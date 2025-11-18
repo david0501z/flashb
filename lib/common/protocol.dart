@@ -26,16 +26,14 @@ class Protocol {
       
       // 1. 创建主协议键并设置 URL Protocol 标识
       final protocolKey = Registry.currentUser.createKey(protocolRegKey);
-      protocolKey.createValue(RegistryValue(
+      protocolKey.createValue(RegistryValue.string(
         'URL Protocol', 
-        RegistryValueType.string, 
         '',  // 空字符串是标准做法
       ));
       
       // 2. 设置协议友好名称（可选）
-      protocolKey.createValue(RegistryValue(
+      protocolKey.createValue(RegistryValue.string(
         '',  // 默认值
-        RegistryValueType.string, 
         'URL:$scheme Protocol',
       ));
       
@@ -45,9 +43,8 @@ class Protocol {
       final commandKey = Registry.currentUser.createKey('$protocolRegKey\\shell\\open\\command');
       
       // 4. 设置启动命令
-      commandKey.createValue(RegistryValue(
+      commandKey.createValue(RegistryValue.string(
         '',  // 默认值
-        RegistryValueType.string, 
         '"${Platform.resolvedExecutable}" "%1"',
       ));
       
@@ -62,14 +59,21 @@ class Protocol {
   bool unregister(String scheme) {
     try {
       String protocolRegKey = 'Software\\Classes\\$scheme';
-      if (Registry.currentUser.openKey(protocolRegKey) != null) {
-        Registry.currentUser.deleteKey(protocolRegKey, recursive: true);
-        print('✅ Protocol $scheme unregistered successfully');
-        return true;
-      } else {
-        print('ℹ️ Protocol $scheme was not registered');
-        return true;
+      
+      // 使用 try-catch 来检查键是否存在，因为新版本中 openKey 可能已改变
+      try {
+        final key = Registry.currentUser.openKey(protocolRegKey);
+        if (key != null) {
+          Registry.currentUser.deleteKey(protocolRegKey, recursive: true);
+          print('✅ Protocol $scheme unregistered successfully');
+          return true;
+        }
+      } catch (e) {
+        // 如果打开键失败，可能键不存在
       }
+      
+      print('ℹ️ Protocol $scheme was not registered');
+      return true;
     } catch (e) {
       print('❌ Error unregistering protocol $scheme: $e');
       return false;
