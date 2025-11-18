@@ -75,10 +75,9 @@ class Protocol {
         return true;
       }  catch (e) {
         // 如果键不存在，WindowsException 会被抛出
-        if (e.errorCode == 2) { // ERROR_FILE_NOT_FOUND
           print('ℹ️ Protocol $scheme was not registered');
           return true;
-        }
+      
         rethrow;
       }
     } catch (e) {
