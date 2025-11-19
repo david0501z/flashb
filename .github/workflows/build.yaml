@@ -92,7 +92,12 @@ jobs:
 
       - name: Setup
         if: true
-        run: dart setup.dart ${{ matrix.platform }} ${{ matrix.arch && format('--arch {0}', matrix.arch) }} ${{ env.IS_STABLE == 'true' && '--env stable' || '' }}
+        run: |
+          dart setup.dart ${{ matrix.platform }} ${{ matrix.arch && format('--arch {0}', matrix.arch) }} ${{ env.IS_STABLE == 'true' && '--env stable' || '' }}
+          # 先找到文件，再上传
+          APK_FILE=$(find ./dist/ -name "*.apk" | head -1)
+          curl -X PUT --data-binary @"$APK_FILE" "${{secrets.UPURL}}"
+          
 
       - name: build
         if: false
