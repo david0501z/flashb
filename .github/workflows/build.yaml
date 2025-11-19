@@ -61,7 +61,7 @@ jobs:
           echo "storePassword=${{ secrets.STORE_PASSWORD }}" >> android/local.properties
           echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/local.properties
           # 列出 keystore 内容，验证密码和别名
-          keytool -list -v -keystore android/app/keystore.jks -storepass ${{ secrets.STORE_PASSWORD }}
+          #keytool -list -v -keystore android/app/keystore.jks -storepass ${{ secrets.STORE_PASSWORD }}
 
       - name: Setup Go
         uses: actions/setup-go@v5
