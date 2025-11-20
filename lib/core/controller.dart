@@ -136,82 +136,126 @@ class CoreController {
     required SelectedMap selectedMap,
     required String defaultTestUrl,
   }) async {
-    final proxies = await _interface.getProxies();
-    return Isolate.run<List<Group>>(() {
-      if (proxies.isEmpty) return [];
-      
-      // 添加调试日志以便排查问题
-      commonPrint.log('Available proxies keys: ${proxies.keys.toList()}');
-      
-      // 检查 GLOBAL 组是否存在
-      if (!proxies.containsKey(UsedProxy.GLOBAL.name)) {
-        commonPrint.log('GLOBAL proxy group not found, available groups: ${proxies.keys.toList()}', logLevel: LogLevel.warning);
-        return [];
-      }
-      
-      final globalGroup = proxies[UsedProxy.GLOBAL.name];
-      if (globalGroup == null || globalGroup['all'] == null) {
-        commonPrint.log('GLOBAL group is null or has no proxies', logLevel: LogLevel.warning);
-        return [];
-      }
-      
-      final globalAll = globalGroup['all'] as List?;
-      if (globalAll == null || globalAll.isEmpty) {
-        commonPrint.log('GLOBAL group has no proxy items', logLevel: LogLevel.warning);
-        return [];
-      }
-      
-      final groupNames = [
-        UsedProxy.GLOBAL.name,
-        ...globalAll.where((e) {
-          final proxy = proxies[e] ?? {};
-          final isValidType = GroupTypeExtension.valueList.contains(proxy['type']);
-          if (!isValidType) {
-            commonPrint.log('Skipping proxy $e due to invalid type: ${proxy['type']}');
-          }
-          return isValidType;
-        }),
-      ];
-      
-      commonPrint.log('Filtered group names: $groupNames');
-      
-      final groupsRaw = groupNames.map((groupName) {
-        final group = proxies[groupName];
-        if (group == null) {
-          commonPrint.log('Group $groupName is null, skipping', logLevel: LogLevel.warning);
-          return null;
+    try {
+      final proxies = await _interface.getProxies();
+      return Isolate.run<List<Group>>(() {
+        if (proxies.isEmpty) {
+          commonPrint.log('No proxies available from core', logLevel: LogLevel.warning);
+          return [];
         }
         
-        final allProxies = ((group['all'] ?? []) as List)
-            .map((name) => proxies[name])
-            .where((proxy) => proxy != null)
-            .toList();
-            
-        group['all'] = allProxies;
-        return group;
-      }).where((group) => group != null).toList();
-      
-      if (groupsRaw.isEmpty) {
-        commonPrint.log('No valid groups found after processing', logLevel: LogLevel.warning);
-        return [];
-      }
-      
-      try {
-        final groups = groupsRaw.map((e) => Group.fromJson(e)).toList();
-        commonPrint.log('Successfully parsed ${groups.length} groups');
+        // 添加调试日志以便排查问题
+        commonPrint.log('Available proxies keys: ${proxies.keys.toList()}');
         
-        return computeSort(
-          groups: groups,
-          sortType: sortType,
-          delayMap: delayMap,
-          selectedMap: selectedMap,
-          defaultTestUrl: defaultTestUrl,
-        );
-      } catch (e) {
-        commonPrint.log('Error parsing groups: $e', logLevel: LogLevel.error);
-        return [];
-      }
-    });
+        // 检查 GLOBAL 组是否存在，如果不存在尝试使用第一个可用组
+        String primaryGroupName = UsedProxy.GLOBAL.name;
+        if (!proxies.containsKey(primaryGroupName)) {
+          // 尝试找到第一个有效的代理组
+          final availableGroups = proxies.keys.where((key) {
+            final group = proxies[key];
+            return group != null && 
+                   group['all'] != null && 
+                   (group['all'] as List).isNotEmpty &&
+                   GroupTypeExtension.valueList.contains(group['type']);
+          }).toList();
+          
+          if (availableGroups.isEmpty) {
+            commonPrint.log('No valid proxy groups found, available groups: ${proxies.keys.toList()}', logLevel: LogLevel.error);
+            return [];
+          }
+          
+          primaryGroupName = availableGroups.first;
+          commonPrint.log('Using alternative primary group: $primaryGroupName', logLevel: LogLevel.info);
+        }
+        
+        final globalGroup = proxies[primaryGroupName];
+        if (globalGroup == null || globalGroup['all'] == null) {
+          commonPrint.log('Primary group $primaryGroupName is null or has no proxies', logLevel: LogLevel.error);
+          return [];
+        }
+        
+        final globalAll = globalGroup['all'] as List?;
+        if (globalAll == null || globalAll.isEmpty) {
+          commonPrint.log('Primary group $primaryGroupName has no proxy items', logLevel: LogLevel.warning);
+          // 即使没有子代理，也返回主组本身
+          globalAll ??= [];
+        }
+        
+        final groupNames = [
+          primaryGroupName,
+          ...globalAll.where((e) {
+            if (e == null || e == primaryGroupName) return false;
+            final proxy = proxies[e] ?? {};
+            final isValidType = proxy['type'] == null || 
+                               GroupTypeExtension.valueList.contains(proxy['type']);
+            if (!isValidType) {
+              commonPrint.log('Skipping proxy $e due to invalid type: ${proxy['type']}');
+            }
+            return isValidType;
+          }),
+        ];
+        
+        commonPrint.log('Filtered group names: $groupNames');
+        
+        final groupsRaw = groupNames.map((groupName) {
+          final group = proxies[groupName];
+          if (group == null) {
+            commonPrint.log('Group $groupName is null, skipping', logLevel: LogLevel.warning);
+            return null;
+          }
+          
+          try {
+            final allProxies = ((group['all'] ?? []) as List)
+                .map((name) {
+                  if (name == null) return null;
+                  final proxy = proxies[name.toString()];
+                  if (proxy == null) {
+                    commonPrint.log('Proxy $name not found in group $groupName', logLevel: LogLevel.warning);
+                  }
+                  return proxy;
+                })
+                .where((proxy) => proxy != null)
+                .cast<Map<String, dynamic>>()
+                .toList();
+                
+            // 创建新的组映射，确保数据完整性
+            final processedGroup = Map<String, dynamic>.from(group);
+            processedGroup['all'] = allProxies;
+            processedGroup['name'] = groupName;
+            
+            return processedGroup;
+          } catch (e) {
+            commonPrint.log('Error processing group $groupName: $e', logLevel: LogLevel.error);
+            return null;
+          }
+        }).where((group) => group != null).cast<Map<String, dynamic>>().toList();
+        
+        if (groupsRaw.isEmpty) {
+          commonPrint.log('No valid groups found after processing', logLevel: LogLevel.error);
+          return [];
+        }
+        
+        try {
+          final groups = groupsRaw.map((e) => Group.fromJson(e)).toList();
+          commonPrint.log('Successfully parsed ${groups.length} groups');
+          
+          return computeSort(
+            groups: groups,
+            sortType: sortType,
+            delayMap: delayMap,
+            selectedMap: selectedMap,
+            defaultTestUrl: defaultTestUrl,
+          );
+        } catch (e) {
+          commonPrint.log('Error parsing groups: $e', logLevel: LogLevel.error);
+          commonPrint.log('Raw groups data: ${groupsRaw.take(2).toList()}', logLevel: LogLevel.debug);
+          return [];
+        }
+      });
+    } catch (e) {
+      commonPrint.log('Critical error in getProxiesGroups: $e', logLevel: LogLevel.error);
+      return [];
+    }
   }
 
   FutureOr<String> changeProxy(ChangeProxyParams changeProxyParams) async {
