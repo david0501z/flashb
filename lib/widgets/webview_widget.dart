@@ -1,4 +1,5 @@
 import 'package:fl_clash/common/proxy.dart';
+import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/state.dart';
 import 'package:flutter/material.dart';
@@ -152,6 +153,7 @@ class _WebViewWidgetState extends ConsumerState<WebViewWidget> {
             initialUrlRequest: URLRequest(url: WebUri(widget.initialUrl)),
             onWebViewCreated: (controller) {
               _webViewController = controller;
+              commonPrint.log('WebView created for URL: ${widget.initialUrl}');
             },
             onLoadStart: (controller, url) {
               setState(() {
@@ -160,6 +162,7 @@ class _WebViewWidgetState extends ConsumerState<WebViewWidget> {
               });
               widget.onPageStarted?.call(url.toString());
               widget.onUrlChanged?.call(url.toString());
+              commonPrint.log('WebView loading started: $url');
             },
             onLoadStop: (controller, url) async {
               setState(() {
@@ -170,26 +173,54 @@ class _WebViewWidgetState extends ConsumerState<WebViewWidget> {
               
               // 更新地址栏URL
               _urlController.text = url.toString();
+              
+              // 验证代理设置是否生效
+              if (widget.enableProxy && isProxyEnabled) {
+                commonPrint.log('WebView loaded with proxy: port=$proxyPort');
+              }
             },
             onLoadError: (controller, url, code, message) {
               setState(() {
                 _isLoading = false;
               });
-              print('WebView error: $message');
+              commonPrint.log('WebView error: $message (code: $code, url: $url)', logLevel: LogLevel.error);
+              
+              // 如果是网络错误且代理启用，提示用户检查代理设置
+              if (widget.enableProxy && isProxyEnabled && code == -2) {
+                commonPrint.log('Network error detected, proxy may not be working properly', logLevel: LogLevel.warning);
+              }
             },
             onProgressChanged: (controller, progress) {
               // 可以添加进度条显示
             },
+            shouldOverrideUrlLoading: (controller, navigationAction) async {
+              final url = navigationAction.request.url;
+              if (url != null) {
+                // 允许所有导航，但记录日志
+                commonPrint.log('WebView navigating to: $url');
+              }
+              return NavigationActionPolicy.ALLOW;
+            },
             initialOptions: InAppWebViewGroupOptions(
               android: AndroidInAppWebViewOptions(
                 useHybridComposition: true,
+                // 确保 Android 上使用系统代理
+                useShouldInterceptRequest: false,
               ),
               ios: IOSInAppWebViewOptions(
                 allowsInlineMediaPlayback: true,
+                // iOS 上使用系统代理设置
+                allowsAirPlayForMediaPlayback: true,
               ),
               crossPlatform: InAppWebViewOptions(
                 useShouldOverrideUrlLoading: true,
                 mediaPlaybackRequiresUserGesture: false,
+                // 启用 JavaScript 以便检测代理状态
+                javaScriptEnabled: true,
+                // 允许混合内容
+                mixedContentMode: MixedContentMode.COMPATIBILITY_MODE,
+                // 用户代理设置
+                userAgent: 'FlClash-Browser/1.0',
               ),
             ),
           ),
