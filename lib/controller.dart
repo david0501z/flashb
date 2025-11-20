@@ -305,20 +305,67 @@ class AppController {
   }
 
   Future<void> _setupClashConfig() async {
-    await _ref.read(currentProfileProvider)?.checkAndUpdate();
-    final patchConfig = _ref.read(patchClashConfigProvider);
-    final res = await _requestAdmin(patchConfig.tun.enable);
-    if (res.isError) {
-      return;
+    try {
+      // 检查并更新当前配置文件
+      final currentProfile = _ref.read(currentProfileProvider);
+      if (currentProfile != null) {
+        await currentProfile.checkAndUpdate();
+        commonPrint.log('Profile checked and updated: ${currentProfile.label ?? currentProfile.id}');
+      } else {
+        commonPrint.log('No current profile found', logLevel: LogLevel.warning);
+        throw 'No current profile configured';
+      }
+      
+      final patchConfig = _ref.read(patchClashConfigProvider);
+      
+      // 请求管理员权限（仅在需要 TUN 模式时）
+      if (patchConfig.tun.enable) {
+        final res = await _requestAdmin(true);
+        if (res.isError) {
+          commonPrint.log('Failed to get administrator privileges for TUN mode: ${res.message}', logLevel: LogLevel.error);
+          // 如果 TUN 模式需要管理员权限但获取失败，尝试禁用 TUN 模式
+          final fallbackConfig = patchConfig.copyWith.tun(enable: false);
+          commonPrint.log('Falling back to non-TUN mode due to insufficient privileges');
+          await _applyConfig(fallbackConfig);
+          return;
+        }
+      }
+      
+      final realTunEnable = _ref.read(realTunEnableProvider);
+      final realPatchConfig = patchConfig.copyWith.tun(enable: realTunEnable);
+      
+      await _applyConfig(realPatchConfig);
+      
+    } catch (e) {
+      commonPrint.log('Error in setupClashConfig: $e', logLevel: LogLevel.error);
+      rethrow;
     }
-    final realTunEnable = _ref.read(realTunEnableProvider);
-    final realPatchConfig = patchConfig.copyWith.tun(enable: realTunEnable);
-    final message = await coreController.setupConfig(realPatchConfig);
+  }
+
+  Future<void> _applyConfig(dynamic patchConfig) async {
+    final message = await coreController.setupConfig(patchConfig);
+    
+    // 更新最后修改时间
     lastProfileModified = await _ref.read(
       currentProfileProvider.select((state) => state?.profileLastModified),
     );
+    
     if (message.isNotEmpty) {
-      throw message;
+      throw 'Configuration setup failed: $message';
+    }
+    
+    commonPrint.log('Configuration applied successfully');
+    
+    // 启动监听器以确保代理服务正常运行
+    try {
+      final listenerStarted = await coreController.startListener();
+      if (!listenerStarted) {
+        commonPrint.log('Warning: Failed to start listener', logLevel: LogLevel.warning);
+      } else {
+        commonPrint.log('Listener started successfully');
+      }
+    } catch (e) {
+      commonPrint.log('Error starting listener: $e', logLevel: LogLevel.warning);
     }
   }
 
@@ -357,16 +404,32 @@ class AppController {
   Future<void> autoUpdateProfiles() async {
     for (final profile in _ref.read(profilesProvider)) {
       if (!profile.autoUpdate) continue;
-      final isNotNeedUpdate = profile.lastUpdateDate
-          ?.add(profile.autoUpdateDuration)
-          .isBeforeNow;
-      if (isNotNeedUpdate == false || profile.type == ProfileType.file) {
+      if (profile.type == ProfileType.file) {
         continue;
       }
+      
+      // 修复逻辑错误：应该是需要更新才继续，而不是不需要更新
+      final needUpdate = profile.lastUpdateDate == null ||
+          profile.lastUpdateDate!.add(profile.autoUpdateDuration).isBeforeNow;
+      
+      if (!needUpdate) {
+        continue;
+      }
+      
       try {
+        // 设置更新状态
+        _ref
+            .read(profilesProvider.notifier)
+            .setProfile(profile.copyWith(isUpdating: true));
+        
         await updateProfile(profile);
+        commonPrint.log('Profile ${profile.label ?? profile.id} updated successfully');
       } catch (e) {
-        commonPrint.log(e.toString(), logLevel: LogLevel.warning);
+        commonPrint.log('Failed to update profile ${profile.label ?? profile.id}: $e', logLevel: LogLevel.error);
+        // 清除更新状态
+        _ref
+            .read(profilesProvider.notifier)
+            .setProfile(profile.copyWith(isUpdating: false));
       }
     }
   }
@@ -417,13 +480,46 @@ class AppController {
     required String groupName,
     required String proxyName,
   }) async {
-    await coreController.changeProxy(
-      ChangeProxyParams(groupName: groupName, proxyName: proxyName),
-    );
-    if (_ref.read(appSettingProvider).closeConnections) {
-      coreController.closeConnections();
+    try {
+      commonPrint.log('Changing proxy: $groupName -> $proxyName');
+      
+      await coreController.changeProxy(
+        ChangeProxyParams(groupName: groupName, proxyName: proxyName),
+      );
+      
+      // 更新选中映射
+      final currentProfile = _ref.read(currentProfileProvider);
+      if (currentProfile != null) {
+        final updatedSelectedMap = Map<String, String>.from(currentProfile.selectedMap);
+        updatedSelectedMap[groupName] = proxyName;
+        
+        final updatedProfile = currentProfile.copyWith(
+          selectedMap: updatedSelectedMap,
+        );
+        
+        _ref.read(profilesProvider.notifier).setProfile(updatedProfile);
+        commonPrint.log('Updated selected map for group $groupName: $proxyName');
+      }
+      
+      // 关闭现有连接（如果设置启用）
+      if (_ref.read(appSettingProvider).closeConnections) {
+        coreController.closeConnections();
+        commonPrint.log('Closed existing connections');
+      }
+      
+      // 触发 IP 检查
+      addCheckIpNumDebounce();
+      
+      // 刷新代理组以确保状态同步
+      await updateGroups();
+      
+      commonPrint.log('Proxy change completed successfully');
+    } catch (e) {
+      commonPrint.log('Failed to change proxy: $e', logLevel: LogLevel.error);
+      // 重新加载代理组以恢复状态
+      await updateGroups();
+      rethrow;
     }
-    addCheckIpNumDebounce();
   }
 
   Future<void> handleBackOrExit() async {
